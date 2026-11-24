@@ -1,2 +1,24 @@
-# klaigen-travel-tools
-Claude Code skills for travel agents (Hebrew): trip planner and price quote. By KLAI.GEN
+# כלים לסוכני נסיעות ל-Claude Code
+
+שני כלים (Skills) ל-Claude Code, בעברית, של KLAI.GEN:
+
+- **tour-planner** – תכנון טיול ללקוח: PDF יום-יום בעיצוב העסק, עם זמני הליכה מהמלון, דירוגים וקישורי ניווט, וקובץ מפה ל-Google My Maps.
+- **price-quote** – הצעת מחיר מעוצבת מהפרטים שהספק שלח: כריכה, מפת מסלול, כרטיסי טיסה, כרטיס לכל מלון, העברות, מחיר (גם בשקלים) ותנאים.
+
+## התקנה
+
+ההוראות המלאות, עם צילומי מסך: **https://tour-planner-guide.vercel.app**
+
+בקצרה:
+1. מנוי Claude Pro, ואפליקציית Claude למחשב (Mac או Windows), בלשונית Code.
+2. תיקייה בשם `קלוד לעסק`, שבוחרים אותה בשיחה (Open folder). מודל Sonnet, מצב Bypass permissions.
+3. מדביקים את המאסטר פרומפט מדף ההוראות. Claude מוריד את `travel-tools.zip` מכאן, מפרק אותו ל-`.claude/skills` ושואל כמה שאלות על העסק.
+4. פותחים שיחה חדשה באותה תיקייה, וכותבים בקשה: "תבנה תכנון טיול ל..." או "תכין הצעת מחיר ל...".
+
+התקנה ידנית: לפרק את `travel-tools.zip` כך שיהיו `.claude/skills/tour-planner/SKILL.md` ו-`.claude/skills/price-quote/SKILL.md` בתוך תיקיית העבודה.
+
+## חשוב
+
+AI מכין, אתם מאשרים: לפני ששולחים ללקוח בודקים שעות, מחירים, הזמנות, ויזות וכשרות מול מקור רשמי. לא מדביקים ל-Claude מספרי דרכון, פרטי אשראי או מסמכים אישיים.
+
+© KLAI.GEN · ליה קינן · [klaigen.com](https://klaigen.com)
