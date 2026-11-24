@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>הצעת מחיר</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Heebo:wght@300;400;500;700&family=Michroma&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!-- The quote data. Claude writes this file for every quote. -->
+<script src="quote.js"></script>
+<style>
+  :root{
+    --brand:#0F766E; --brand-ink:#0B3B37; --brand-soft:#E6F2F1;
+    --ink:#1D1B24; --muted:#6A6676; --line:#E8E4DC; --paper:#F8F3E9; --cream:#FAF7F1; --gold:#C9A45C; --ok:#1E7F5C; --ok-soft:#E5F4EC;
+  }
+  @page{ size:A4; margin:0; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--page,#fff); color:var(--ink); font-family:"Heebo","Arial Hebrew",Arial,sans-serif; font-size:10.4pt; line-height:1.5;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  a{ color:inherit; text-decoration:none; }
+  .page{ width:210mm; min-height:297mm; position:relative; overflow:hidden; break-after:page; background:var(--page,#fff); }
+  .page:last-child{ break-after:auto; }
+  .pad{ padding:14mm 14mm 16mm; }
+  @media screen{ body{ background:#D9D5CC; padding:16px; } .page{ margin:0 auto 16px; box-shadow:0 6px 30px rgba(0,0,0,.15); } }
+  h1,h2,h3{ margin:0; font-family:"Rubik",Arial,sans-serif; }
+  .latin{ font-family:"Michroma",Arial,sans-serif; text-transform:uppercase; letter-spacing:.18em; }
+
+  /* ---------- cover ---------- */
+  .hero{ position:relative; height:150mm; background:var(--brand-ink); }
+  .hero img.photo{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(10,22,20,.86) 0%, rgba(10,22,20,.35) 48%, rgba(10,22,20,.15) 100%); }
+  .hero-top{ position:absolute; top:11mm; right:14mm; left:14mm; z-index:2; display:flex; justify-content:space-between; align-items:flex-start; }
+  .logo-box{ background:var(--logo-bg, rgba(255,255,255,.94)); border-radius:12px; padding:2.5mm 4mm; display:flex; align-items:center; gap:3mm; }
+  .logo-box img{ height:var(--logo-h, 11mm); max-width:46mm; object-fit:contain; }
+  .logo-box span{ font-family:Rubik,sans-serif; font-weight:700; font-size:12pt; color:var(--brand-ink); }
+  .flag{ width:17mm; border:2mm solid #fff; border-radius:2.5mm; background:#fff; }
+  .flag img{ display:block; width:100%; border-radius:1mm; }
+  .hero-text{ position:absolute; right:14mm; left:14mm; bottom:12mm; z-index:2; color:#fff; }
+  .eyebrow{ display:inline-block; font-family:Rubik,sans-serif; font-weight:500; font-size:10.5pt; letter-spacing:.5px; color:var(--on-brand,#fff); background:var(--brand); padding:1mm 4mm; border-radius:999px; margin-bottom:4mm; }
+  .hero h1{ font-family:"Rubik",Arial,sans-serif; font-size:31pt; line-height:1.1; font-weight:700; letter-spacing:-.5px; color:#fff; }
+  .hero .sub{ font-size:14pt; margin-top:2mm; opacity:.95; }
+  .credit{ position:absolute; z-index:2; left:4mm; bottom:2mm; font-size:6pt; color:rgba(255,255,255,.75); }
+
+  .facts{ display:grid; grid-template-columns:repeat(4,1fr); margin:-9mm 14mm 0; position:relative; z-index:3; background:#fff; border-radius:14px; border:1px solid var(--line); }
+  .facts div{ padding:4mm 5mm; border-left:1px solid var(--line); }
+  .facts div:last-child{ border-left:none; }
+  .facts .k{ font-size:8pt; color:var(--muted); }
+  .facts .v{ white-space:nowrap; font-family:Rubik,sans-serif; font-weight:500; font-size:11.5pt; color:var(--brand-ink); line-height:1.25; }
+  .cover-body{ padding:8mm 14mm 0; }
+  .intro{ font-size:11pt; line-height:1.6; }
+  .incl{ display:flex; flex-wrap:wrap; gap:2.5mm; margin-top:5mm; }
+  .incl span{ background:var(--brand-soft); color:var(--brand-ink); font-weight:500; font-size:9.5pt; border-radius:999px; padding:1.2mm 3.5mm; }
+  .cover-row{ display:grid; grid-template-columns:1fr 62mm; gap:6mm; margin-top:6mm; align-items:stretch; }
+  .map{ width:100%; height:56mm; border-radius:14px; overflow:hidden; border:1px solid var(--line); background:#EEF1F3; }
+  .legs{ list-style:none; margin:0; padding:0; counter-reset:l; display:flex; flex-direction:column; justify-content:center; gap:2.2mm; }
+  .legs li{ counter-increment:l; display:flex; align-items:center; gap:3mm; font-size:10pt; }
+  .legs li::before{ content:counter(l); width:6mm; height:6mm; border-radius:50%; background:var(--brand); color:var(--on-brand,#fff); font:500 9pt/6mm Rubik,sans-serif; text-align:center; flex:none; }
+  .legs b{ font-weight:500; }
+  .legs i{ font-style:normal; color:var(--muted); margin-inline-start:auto; font-size:9pt; }
+
+  /* ---------- section headers ---------- */
+  .sec{ display:flex; align-items:baseline; gap:3mm; margin:0 0 4mm; }
+  .sec .en{ font-family:Michroma,Arial,sans-serif; font-size:6.5pt; letter-spacing:.25em; color:var(--label,var(--gold)); text-transform:uppercase; direction:ltr; }
+  .sec h2{ font-family:"Rubik",Arial,sans-serif; font-weight:700; letter-spacing:-.3px; font-size:19pt; color:var(--brand-ink); }
+  .sec .rule{ flex:1; height:1px; background:var(--line); align-self:center; }
+  .sec .count{ font-size:9pt; color:var(--muted); }
+  .block + .block{ margin-top:7mm; }
+
+  /* ---------- flights: illustrated boarding pass ---------- */
+  .bp{ display:grid; grid-template-columns:9mm 1fr 46mm; height:52mm; background:var(--paper,#F8F3E9); border:1px solid var(--paper-line,#E6DCC7); border-radius:4mm; overflow:hidden; break-inside:avoid; position:relative; }
+  .bp + .bp{ margin-top:4mm; }
+  .bp-band{ background:var(--brand); color:var(--on-brand,#fff); display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:4mm 0; }
+  .bp-band .vt{ writing-mode:vertical-rl; transform:rotate(180deg); font-family:Michroma,Arial,sans-serif; font-size:6.2pt; letter-spacing:.32em; white-space:nowrap; }
+  .bp-band svg{ width:4.2mm; height:4.2mm; fill:var(--on-brand,#fff); }
+  .bp-main{ position:relative; padding:3.6mm 5mm 3mm; overflow:hidden; }
+  .bp-ph{ position:absolute; left:0; bottom:0; width:60%; height:70%; }
+  .bp-ph img{ width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.88) contrast(1.03); }
+  .bp-ph::after{ content:""; position:absolute; inset:0; background:linear-gradient(to right, transparent 30%, color-mix(in srgb, var(--paper,#F8F3E9) 85%, transparent) 78%, var(--paper,#F8F3E9) 97%), linear-gradient(to bottom, var(--paper,#F8F3E9) 0%, transparent 38%); }
+  .bp-credit{ position:absolute; z-index:2; left:2mm; bottom:1mm; font-size:4.8pt; color:rgba(255,255,255,.9); direction:ltr; text-shadow:0 0 2px rgba(0,0,0,.6); }
+  .bp-top{ position:relative; z-index:2; display:grid; grid-template-columns:auto 1fr auto; align-items:start; gap:3mm; }
+  .bp-ap .code{ font-family:Rubik,sans-serif; font-weight:700; font-size:25pt; line-height:.95; color:var(--brand-ink); letter-spacing:.5px; direction:ltr; }
+  .bp-ap .he{ font-family:Rubik,sans-serif; font-weight:500; font-size:9pt; color:var(--accent-text,var(--brand)); margin-top:.8mm; }
+  .bp-ap .en{ font-family:Michroma,Arial,sans-serif; font-size:5pt; letter-spacing:.14em; color:var(--muted); text-transform:uppercase; direction:ltr; text-align:right; }
+  .bp-ap.to{ text-align:left; } .bp-ap.to .en{ text-align:left; }
+  .bp-mid{ text-align:center; padding-top:1mm; }
+  .bp-mid .lbl{ font-family:Michroma,Arial,sans-serif; font-size:5.4pt; letter-spacing:.3em; color:var(--muted); direction:ltr; }
+  .bp-mid .track{ position:relative; height:9mm; }
+  .bp-mid .track::before{ content:""; position:absolute; left:0; right:0; top:50%; border-top:1.6px dashed var(--accent-text,var(--brand)); opacity:.75; }
+  .bp-mid .track svg{ position:absolute; left:50%; top:50%; width:6.5mm; height:6.5mm; transform:translate(-50%,-50%) rotate(-90deg); fill:var(--accent-text,var(--brand)); background:var(--paper,#F8F3E9); padding:0 1mm; box-sizing:content-box; }
+  .bp-mid .via{ font-size:7.3pt; color:var(--muted); }
+  .bp-fields{ position:absolute; z-index:2; right:5mm; bottom:3mm; width:46%; display:grid; grid-template-columns:1fr 1fr; gap:1.6mm 4mm; }
+  .bp-fields .k{ font-size:6.6pt; color:var(--muted); line-height:1.1; }
+  .bp-fields .v{ font-family:Rubik,sans-serif; font-weight:500; font-size:10pt; white-space:nowrap; color:var(--ink); line-height:1.2; }
+  .bp-fields .v small{ display:block; font-size:6.3pt; color:var(--muted); font-weight:400; line-height:1; }
+  .bp-fields .v.air{ font-size:8.8pt; white-space:normal; line-height:1.15; }
+  .bp-stamp{ position:absolute; z-index:2; left:31%; bottom:3mm; width:20mm; height:20mm; transform:rotate(-12deg); opacity:.85; }
+  .bp-stub{ position:relative; border-right:1.6px dashed var(--perf,#CDBFA3); display:flex; flex-direction:column; }
+  .bp-stub::before,.bp-stub::after{ content:""; position:absolute; right:-3.2mm; width:6mm; height:6mm; border-radius:50%; background:var(--page,#fff); border:1px solid var(--paper-line,#E6DCC7); }
+  .bp-stub::before{ top:-3.2mm; } .bp-stub::after{ bottom:-3.2mm; }
+  .bp-stub .head{ background:var(--brand); color:var(--on-brand,#fff); font-family:Michroma,Arial,sans-serif; font-size:5.4pt; letter-spacing:.22em; padding:2mm 3.5mm; display:flex; justify-content:space-between; align-items:center; direction:ltr; }
+  .bp-stub .head svg{ width:3.4mm; height:3.4mm; fill:var(--on-brand,#fff); transform:rotate(90deg); }
+  .bp-stub .body{ padding:2.4mm 3.5mm 0; display:grid; gap:1.4mm; flex:1; }
+  .bp-stub .row{ display:flex; align-items:baseline; gap:2mm; }
+  .bp-stub .k{ font-size:6.2pt; color:var(--muted); width:9mm; flex:none; }
+  .bp-stub .v{ font-family:Rubik,sans-serif; font-weight:500; font-size:8.6pt; color:var(--brand-ink); line-height:1.2; }
+  .bp-stub .v b{ font-weight:700; font-size:11pt; letter-spacing:.3px; }
+  .bp-stub .bag{ font-size:6.6pt; color:var(--ink); line-height:1.3; }
+  .bp-stub .bar{ display:block; width:39mm; height:6mm; margin:0 auto 2.4mm; }
+  .tag{ display:inline-block; font-family:Michroma,Arial,sans-serif; font-size:5pt; letter-spacing:.2em; padding:.5mm 2.4mm; border-radius:999px; background:var(--brand); color:var(--on-brand,#fff); direction:ltr; }
+  .tag.dom{ background:var(--gold); color:#2A2210; }
+
+  /* ---------- stays ---------- */
+  .stay{ display:grid; grid-template-columns:70mm 1fr; border:1px solid var(--line); border-radius:16px; overflow:hidden; break-inside:avoid; background:#fff; }
+  .stay + .stay{ margin-top:5mm; }
+  .stay .ph{ position:relative; min-height:58mm; background:var(--brand-ink); }
+  .stay .ph img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .stay .nights{ position:absolute; top:3mm; right:3mm; background:#fff; color:var(--brand-ink); font:700 9pt Rubik,sans-serif; border-radius:999px; padding:.8mm 3mm; }
+  .stay .citytag{ position:absolute; bottom:0; right:0; left:0; padding:6mm 3.5mm 2.5mm; background:linear-gradient(to top,rgba(0,0,0,.65),rgba(0,0,0,0)); color:#fff; font-size:7pt; }
+  .stay .citytag b{ display:block; font:500 11pt Rubik,sans-serif; }
+  .stay .info{ padding:4.5mm 5.5mm; }
+  .stay .city{ font-family:Heebo,Arial,sans-serif; font-size:8.5pt; font-weight:500; color:var(--accent-text,var(--brand)); letter-spacing:.3px; }
+  .stay h3{ font-family:"Rubik",Arial,sans-serif; font-weight:700; font-size:14.5pt; line-height:1.15; color:var(--brand-ink); margin:1mm 0 2.5mm; direction:ltr; text-align:right; }
+  .rows{ display:grid; grid-template-columns:20mm 1fr; gap:1.4mm 3mm; font-size:9.6pt; }
+  .rows .k{ color:var(--muted); }
+  .rows .v.en{ direction:ltr; text-align:right; }
+  .pills{ display:flex; flex-wrap:wrap; gap:2mm; margin-top:3mm; }
+  .pill{ font-size:8.5pt; font-weight:500; border-radius:999px; padding:.8mm 3mm; }
+  .pill.ok{ background:var(--ok-soft); color:var(--ok); }
+  .pill.info{ background:var(--brand-soft); color:var(--brand-ink); }
+  .photo-note{ font-size:6.5pt; color:var(--muted); margin-top:2.5mm; }
+
+  /* ---------- transfers ---------- */
+  .tl{ position:relative; margin-top:2mm; }
+  .tl::before{ content:""; position:absolute; top:2mm; bottom:2mm; right:13.5mm; width:2px; background:var(--line); }
+  .tl-item{ display:grid; grid-template-columns:28mm 1fr; gap:3mm; padding:1.6mm 0; break-inside:avoid; position:relative; }
+  .tl-date{ text-align:center; }
+  .tl-date span{ display:inline-block; background:var(--brand); color:var(--on-brand,#fff); font:500 9pt Rubik,sans-serif; border-radius:999px; padding:.6mm 3mm; position:relative; z-index:1; }
+  .tl-item b{ font-family:Rubik,sans-serif; font-weight:500; }
+  .tl-item p{ margin:.3mm 0 0; color:var(--muted); font-size:9.5pt; }
+  .note{ background:var(--cream); border-radius:12px; padding:3mm 4.5mm; font-size:9.6pt; margin-bottom:4mm; }
+
+  /* ---------- price + terms ---------- */
+  .price{ border-radius:16px; overflow:hidden; border:1px solid var(--line); break-inside:avoid; }
+  .price table{ width:100%; border-collapse:collapse; font-size:10pt; }
+  .price td{ padding:2.1mm 5mm; border-bottom:1px solid var(--line); }
+  .price td.n{ text-align:left; font-family:Rubik,sans-serif; font-weight:500; white-space:nowrap; }
+  .price .total{ background:var(--brand); color:var(--on-brand,#fff); display:flex; justify-content:space-between; align-items:center; padding:4mm 5mm; }
+  .price .total b{ font-family:Rubik,sans-serif; font-size:17pt; }
+  .price .total span{ font-size:10pt; opacity:.9; }
+  .price small.alt{ display:block; font-family:Heebo,Arial,sans-serif; font-weight:400; font-size:8.6pt; opacity:.75; margin-top:.4mm; }
+  .price .total b{ text-align:left; }
+  .price-note{ padding:2.6mm 5mm; font-size:8.2pt; color:var(--muted); border-top:1px solid var(--line); }
+  .pay{ list-style:none; margin:0; padding:0; display:grid; gap:2.5mm; }
+  .pay li{ background:var(--cream); border-right:3px solid var(--gold); border-radius:10px; padding:2.6mm 4mm; font-size:9.8pt; }
+  .terms{ margin:0; padding-inline-start:5mm; color:var(--muted); font-size:9pt; }
+  .terms li{ margin-bottom:1mm; }
+  .contact{ margin-top:6mm; background:var(--contact-bg,var(--brand-ink)); color:var(--contact-fg,#fff); border-radius:16px; padding:6mm 7mm; display:grid; grid-template-columns:1fr auto; gap:5mm; align-items:center; break-inside:avoid; }
+  .contact .t{ font-family:"Rubik",Arial,sans-serif; font-size:16pt; font-weight:700; }
+  .contact .s{ opacity:.85; font-size:9.6pt; margin-top:1mm; }
+  .wa{ display:inline-block; background:#25D366; color:#fff; font-weight:700; padding:2.2mm 5mm; border-radius:999px; font-size:10.5pt; }
+  .foot{ position:absolute; bottom:6mm; right:14mm; left:14mm; display:flex; justify-content:space-between; font-size:7.5pt; color:var(--muted); }
+  .mk{ width:22px; height:22px; border-radius:50%; background:var(--brand); color:var(--on-brand,#fff); font:500 11px/18px Rubik,Arial,sans-serif; text-align:center; border:2px solid #fff; }
+  .soft-tiles{ filter:saturate(.35) brightness(1.06) contrast(.92); }
+  .lbl{ background:#fff; color:var(--brand-ink); font:500 9px/1 Heebo,Arial,sans-serif; padding:3px 6px; border-radius:6px; border:1px solid var(--line); white-space:nowrap; direction:rtl; }
+  .leaflet-control-attribution{ font-size:6.5px !important; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+  const Q = window.QUOTE, app = document.getElementById('app');
+  if(!Q){ app.innerHTML = '<p>quote.js not found</p>'; return; }
+  const A = Q.agency || {}, C = Q.client || {};
+  const R = document.documentElement.style;
+  if(A.color) R.setProperty('--brand', A.color);
+  if(A.colorDark) R.setProperty('--brand-ink', A.colorDark);
+  if(A.colorSoft) R.setProperty('--brand-soft', A.colorSoft);
+  if(A.accent) R.setProperty('--gold', A.accent);
+  const V = {onBrand:'--on-brand', accentText:'--accent-text', label:'--label', paper:'--paper', paperLine:'--paper-line', perf:'--perf', page:'--page', cream:'--cream', contactBg:'--contact-bg', contactFg:'--contact-fg', line:'--line'};
+  Object.keys(V).forEach(k => { if(A[k]) R.setProperty(V[k], A[k]); });
+  if(A.logoBg) R.setProperty('--logo-bg', A.logoBg);
+  if(A.logoHeight) R.setProperty('--logo-h', A.logoHeight);
+  document.title = 'הצעת מחיר · ' + (C.title || '');
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const ltr = s => /^[\d\s.\-–\/:+]+$/.test(String(s ?? '').trim()) ? '<bdi dir="ltr">' + esc(s) + '</bdi>' : esc(s);
+  const noEmoji = s => String(s ?? '').replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu, '').trim();
+  const wa = A.whatsapp ? 'https://wa.me/' + String(A.whatsapp).replace(/\D/g,'') : null;
+  const logo = A.logo ? '<img src="' + esc(A.logo) + '" alt="">' : '<span>' + esc(A.name) + '</span>';
+  const foot = n => '<div class="foot"><span>' + esc(A.name) + (A.phone ? ' · ' + esc(A.phone) : '') + '</span><span>הצעת מחיר · ' + esc(C.title) + ' · <span class="pn">' + n + '</span></span></div>';
+  let h = '', pageNo = 1;
+
+  /* ---------- page 1: cover ---------- */
+  h += '<section class="page">';
+  h += '<div class="hero">' + (C.photo ? '<img class="photo" src="' + esc(C.photo) + '" alt="">' : '') +
+       '<div class="hero-top"><div class="logo-box">' + logo + '</div>' + (C.countryCode ? '<div class="flag"><img src="https://flagcdn.com/w160/' + esc(String(C.countryCode).toLowerCase()) + '.png" alt=""></div>' : '') + '</div>' +
+       '<div class="hero-text"><div class="latin" style="font-size:7pt;opacity:.9;margin-bottom:3mm">Price quote' + (C.destinationLatin ? ' · ' + esc(C.destinationLatin) : '') + '</div><span class="eyebrow">הצעת מחיר</span><h1>' + esc(C.title) + '</h1><div class="sub">' + esc(C.subtitle) + '</div></div>' +
+       (C.photoCredit ? '<div class="credit">' + esc(C.photoCredit) + '</div>' : '') + '</div>';
+  const facts = [['תאריכים', C.dates], ['משך', C.nights], ['נוסעים', C.travelers], [Q.validUntil ? 'בתוקף עד' : 'תאריך ההצעה', Q.validUntil || Q.issued]].filter(f => f[1]);
+  h += '<div class="facts" style="grid-template-columns:repeat(' + facts.length + ',1fr)">' + facts.map(f => '<div><div class="k">' + esc(f[0]) + '</div><div class="v">' + ltr(f[1]) + '</div></div>').join('') + '</div>';
+  h += '<div class="cover-body">';
+  if(Q.intro) h += '<p class="intro">' + esc(Q.intro) + '</p>';
+  if((Q.includes||[]).length) h += '<div class="incl">' + Q.includes.map(i => '<span>' + esc(i.icon ? i.icon + ' ' : '') + esc(i.text || i) + '</span>').join('') + '</div>';
+  if((Q.route||[]).length){
+    h += '<div class="cover-row"><div class="map" id="route-map" dir="ltr"></div><ol class="legs">' +
+      Q.route.map(r => '<li><b>' + esc(r.name) + '</b><i>' + (r.nights ? esc(r.nights) + (r.nights === 1 ? ' לילה' : ' לילות') : '') + '</i></li>').join('') + '</ol></div>';
+  }
+  h += '</div>' + foot(pageNo++) + '</section>';
+
+  /* ---------- page 2: flights ---------- */
+  const intl = (Q.flights||[]).filter(f => f.kind !== 'domestic'), dom = (Q.flights||[]).filter(f => f.kind === 'domestic');
+  const PLANE = '<svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>';
+  const barcode = str => { let x = 0, r = ''; const seed = String(str); for(let i = 0; x < 156; i++){ const c = seed.charCodeAt(i % seed.length) + i * 7; const w = 1 + (c % 3); if(i % 2 === 0) r += '<rect x="' + x + '" y="0" width="' + w + '" height="24"/>'; x += w + (c % 2); } return '<svg class="bar" viewBox="0 0 156 24" preserveAspectRatio="none" fill="#1D1B24">' + r + '</svg>'; };
+  const stamp = f => { const ring = ((f.toLocal || f.to) + ' • ' + (f.toCountry || f.to) + ' • ').toUpperCase().split('');
+    const step = 360 / ring.length; let t = '';
+    ring.forEach((c, i) => { t += '<text x="50" y="21" text-anchor="middle" transform="rotate(' + (i * step).toFixed(1) + ' 50 50)">' + esc(c) + '</text>'; });
+    return '<svg class="bp-stamp" viewBox="0 0 100 100" style="color:var(--accent-text,var(--brand))">' +
+      '<circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="1"/>' +
+      '<g fill="currentColor" style="font:700 8.5px Rubik,Arial,sans-serif">' + t + '</g>' +
+      '<g transform="translate(38 38)" fill="currentColor"><path transform="rotate(-45 12 12)" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>'; };
+  const pass = f => '<div class="bp">' +
+    '<div class="bp-band"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2.5 12h19M12 2.5c3 3.2 3 15.8 0 19M12 2.5c-3 3.2-3 15.8 0 19" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><span class="vt">BOARDING PASS</span>' + PLANE.replace('<svg ', '<svg style="transform:rotate(-90deg)" ') + '</div>' +
+    '<div class="bp-main">' + (f.photo ? '<div class="bp-ph"><img src="' + esc(f.photo) + '" alt=""></div>' : '') + (f.photoCredit ? '<div class="bp-credit">' + esc(f.photoCredit) + '</div>' : '') +
+      '<div class="bp-top"><div class="bp-ap"><div class="code">' + esc(f.from) + '</div><div class="he">' + esc(f.fromName) + '</div>' + (f.fromLocal ? '<div class="en">' + esc(f.fromLocal) + '</div>' : '') + '</div>' +
+      '<div class="bp-mid"><span class="tag' + (f.kind === 'domestic' ? ' dom' : '') + '">' + (f.kind === 'domestic' ? 'DOMESTIC' : 'INTERNATIONAL') + '</span><div class="track">' + PLANE + '</div>' + (f.via ? '<div class="via">' + esc(f.via) + '</div>' : '') + '</div>' +
+      '<div class="bp-ap to"><div class="code">' + esc(f.to) + '</div><div class="he">' + esc(f.toName) + '</div>' + (f.toLocal ? '<div class="en">' + esc(f.toLocal) + '</div>' : '') + '</div></div>' +
+      stamp(f) +
+      '<div class="bp-fields"><div><div class="k">תאריך</div><div class="v">' + esc(f.date) + '</div></div><div><div class="k">חברת תעופה</div><div class="v air">' + esc(f.airline) + '</div></div>' +
+      '<div><div class="k">המראה</div><div class="v">' + esc(f.dep) + '</div></div><div><div class="k">נחיתה</div><div class="v">' + esc(f.arr) + (f.arrNote ? '<small><bdi dir="ltr">' + esc(f.arrNote) + '</bdi></small>' : '') + '</div></div></div></div>' +
+    '<div class="bp-stub"><div class="head"><span>BOARDING PASS</span>' + PLANE + '</div><div class="body">' +
+      '<div class="row"><span class="k">מ-</span><span class="v"><b>' + esc(f.from) + '</b> ' + esc(f.fromName) + '</span></div>' +
+      '<div class="row"><span class="k">אל</span><span class="v"><b>' + esc(f.to) + '</b> ' + esc(f.toName) + '</span></div>' +
+      (f.flightNo ? '<div class="row"><span class="k">טיסה</span><span class="v">' + esc(f.flightNo) + '</span></div>' : '') +
+      (f.baggage ? '<div class="row"><span class="k">כבודה</span><span class="bag">' + esc(f.baggage) + '</span></div>' : '') +
+    '</div>' + barcode(f.from + f.to + f.date + f.dep) + '</div></div>';
+  const stays = Q.stays || [];
+  const stay = s => '<div class="stay"><div class="ph">' + (s.photo ? '<img src="' + esc(s.photo) + '" alt="">' : '') +
+    '<span class="nights">' + esc(s.nights) + (s.nights === 1 ? ' לילה' : ' לילות') + '</span>' +
+    (s.photoIsCity ? '<div class="citytag"><b>' + esc(s.city) + '</b>תמונת היעד</div>' : '') + '</div>' +
+    '<div class="info"><div class="city">' + esc(s.kind === 'cruise' ? '🛳️ ' : '') + esc(s.city) + (s.cityLocal ? ' · ' + esc(s.cityLocal) : '') + '</div><h3>' + esc(s.name) + '</h3>' +
+    '<div class="rows"><span class="k">תאריכים</span><span class="v">' + ltr(s.dates) + (s.days ? ' · ' + esc(s.days) : '') + '</span>' +
+    (s.guests ? '<span class="k">הרכב</span><span class="v">' + esc(s.guests) + '</span>' : '') +
+    (s.room ? '<span class="k">' + (s.kind === 'cruise' ? 'תא' : 'חדר') + '</span><span class="v' + (/^[\x00-\x7F]+$/.test(s.room) ? ' en' : '') + '">' + esc(s.room) + '</span>' : '') +
+    (s.board ? '<span class="k">פנסיון</span><span class="v">' + esc(s.board) + '</span>' : '') +
+    (s.extra ? '<span class="k">פרטים</span><span class="v">' + esc(s.extra) + '</span>' : '') + '</div>' +
+    '<div class="pills">' + (s.cancel ? '<span class="pill ok">✓ ' + esc(s.cancel) + '</span>' : '') + (s.rating ? '<span class="pill info">★ ' + esc(s.rating) + '</span>' : '') + '</div>' +
+    (s.photoNote ? '<div class="photo-note">' + esc(s.photoNote) + '</div>' : '') + '</div></div>';
+  const staysHead = (first) => '<div class="sec"><h2>' + (first ? 'לינה' : 'לינה, המשך') + '</h2><span class="rule"></span><span class="en">Where you stay</span></div>';
+  // rough heights in mm on a 265mm content area
+  const flightsH = (intl.length ? 16 + intl.length * 56 : 0) + (dom.length ? 16 + dom.length * 56 : 0);
+  const combine = (intl.length || dom.length) && stays.length && flightsH + 18 + stays.length * 104 <= 262;
+  let staysDone = 0;
+  if(intl.length || dom.length){
+    h += '<section class="page"><div class="pad">';
+    if(intl.length) h += '<div class="block"><div class="sec"><h2>טיסות בינלאומיות</h2><span class="rule"></span><span class="en">International flights</span></div>' + intl.map(pass).join('') + '</div>';
+    if(dom.length) h += '<div class="block"><div class="sec"><h2>טיסות פנים</h2><span class="rule"></span><span class="en">Domestic flights</span></div>' + dom.map(pass).join('') + '</div>';
+    if(combine){ h += '<div class="block">' + staysHead(true) + stays.map(stay).join('') + '</div>'; staysDone = stays.length; }
+    h += '</div>' + foot(pageNo++) + '</section>';
+  }
+
+  /* ---------- stays: 3 per page ---------- */
+  for(let i = staysDone; i < stays.length; i += 3){
+    h += '<section class="page"><div class="pad">' + staysHead(i === 0) + stays.slice(i, i + 3).map(stay).join('') + '</div>' + foot(pageNo++) + '</section>';
+  }
+
+  /* ---------- transfers + price + terms ---------- */
+  h += '<section class="page"><div class="pad">';
+  if((Q.transfers||[]).length){
+    h += '<div class="block"><div class="sec"><h2>העברות ותחבורה</h2><span class="rule"></span><span class="en">Transfers</span></div>' + (Q.transfersIntro ? '<div class="note">' + esc(Q.transfersIntro) + '</div>' : '') +
+      '<div class="tl">' + Q.transfers.map(t => '<div class="tl-item"><div class="tl-date"><span dir="ltr">' + esc(t.date) + '</span></div><div><b>' + esc(t.title) + '</b><p>' + esc(t.desc) + '</p></div></div>').join('') + '</div></div>';
+  }
+  const P = Q.price;
+  if(P && ((P.rows||[]).length || P.total)){
+    h += '<div class="block"><div class="sec"><h2>המחיר</h2><span class="rule"></span><span class="en">Price</span></div><div class="price">' +
+      ((P.rows||[]).length ? '<table>' + P.rows.map(r => '<tr><td>' + esc(r.label) + '</td><td class="n"><bdi dir="ltr">' + esc(r.amount) + '</bdi>' + (r.alt ? '<small class="alt"><bdi dir="ltr">' + esc(r.alt) + '</bdi></small>' : '') + '</td></tr>').join('') + '</table>' : '') +
+      (P.total ? '<div class="total"><span>' + esc(P.totalLabel || 'סה״כ לחבילה') + (P.perPerson ? ' · ' + ltr(P.perPerson) : '') + (P.perPersonAlt ? ' · ' + ltr(P.perPersonAlt) : '') + '</span><b><bdi dir="ltr">' + esc(P.total) + '</bdi>' + (P.totalAlt ? '<small class="alt"><bdi dir="ltr">' + esc(P.totalAlt) + '</bdi></small>' : '') + '</b></div>' : '') + (P.note ? '<div class="price-note">' + esc(P.note) + '</div>' : '') + '</div></div>';
+  }
+  if((Q.payment||[]).length) h += '<div class="block"><div class="sec"><h2>תשלום</h2><span class="rule"></span><span class="en">Payment</span></div><ul class="pay">' + Q.payment.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
+  if((Q.terms||[]).length) h += '<div class="block"><div class="sec"><h2>תנאים</h2><span class="rule"></span><span class="en">Terms</span></div><ul class="terms">' + Q.terms.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
+  h += '<div class="contact"><div><div class="t">' + esc(noEmoji(A.contactTitle || 'רוצים לסגור? אנחנו כאן')) + '</div><div class="s">' + esc(A.name) + (A.phone ? ' · ' + esc(A.phone) : '') + (A.email ? ' · ' + esc(A.email) : '') + '</div></div>' + (wa ? '<a class="wa" href="' + wa + '">כתבו לנו בוואטסאפ</a>' : '') + '</div>';
+  h += '</div>' + foot(pageNo++) + '</section>';
+
+  app.innerHTML = h;
+
+  /* ---------- the last page grew past A4: move its last blocks to a new page ---------- */
+  const fitLastPage = () => {
+    const PAGE = 297 * 96 / 25.4 + 2;
+    const last = app.lastElementChild, pad = last && last.querySelector('.pad');
+    if(!pad || last.scrollHeight <= PAGE) return;
+    const moved = [];
+    while(last.scrollHeight > PAGE && pad.children.length > 1){ moved.unshift(pad.lastElementChild); pad.removeChild(pad.lastElementChild); }
+    // never leave the contact box alone on a page
+    if(moved.length === 1 && pad.children.length > 1){ moved.unshift(pad.lastElementChild); pad.removeChild(pad.lastElementChild); }
+    const page = document.createElement('section'); page.className = 'page';
+    const np = document.createElement('div'); np.className = 'pad'; moved.forEach(el => np.appendChild(el));
+    page.appendChild(np); page.insertAdjacentHTML('beforeend', foot(0)); app.appendChild(page);
+    app.querySelectorAll('.foot .pn').forEach((s, i) => { s.textContent = i + 1; });
+  };
+  // measure with the real fonts, which change the heights
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitLastPage); else fitLastPage();
+
+  /* ---------- route map ---------- */
+  const pts = (Q.route||[]).filter(r => typeof r.lat === 'number' && typeof r.lng === 'number');
+  if(pts.length && document.getElementById('route-map')){
+    const m = L.map('route-map', {zoomControl:false, fadeAnimation:false, zoomAnimation:false, markerZoomAnimation:false, dragging:false, scrollWheelZoom:false});
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap contributors', maxZoom:18, className:'soft-tiles'}).addTo(m);
+    const cs = getComputedStyle(document.documentElement); const brand = cs.getPropertyValue('--accent-text').trim() || cs.getPropertyValue('--brand').trim() || '#0F766E';
+    L.polyline(pts.map(p => [p.lat, p.lng]), {color:brand, weight:3, opacity:.85, dashArray:'2 8', lineCap:'round'}).addTo(m);
+    const seen = {};
+    pts.forEach((p, i) => { const key = p.lat.toFixed(3) + ',' + p.lng.toFixed(3); if(seen[key]) return; seen[key] = 1;
+      const nums = pts.map((q, j) => (q.lat.toFixed(3) + ',' + q.lng.toFixed(3)) === key ? j + 1 : null).filter(Boolean).join('·');
+      L.marker([p.lat, p.lng], {icon: L.divIcon({className:'', html:'<div class="mk" style="width:' + (nums.length > 2 ? 34 : 22) + 'px;border-radius:11px">' + nums + '</div>', iconSize:[nums.length > 2 ? 34 : 22, 22], iconAnchor:[nums.length > 2 ? 17 : 11, 11]})}).addTo(m);
+      L.marker([p.lat, p.lng], {icon: L.divIcon({className:'', html:'<div class="lbl">' + esc(p.name) + '</div>', iconSize:null, iconAnchor:[-16, 8]}), interactive:false}).addTo(m); });
+    const fit = () => { m.invalidateSize(false); m.fitBounds(pts.map(p => [p.lat, p.lng]), {padding:[22,22]}); };
+    fit(); if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit); window.addEventListener('load', fit); window.addEventListener('beforeprint', fit);
+  }
+})();
+</script>
+</body>
+</html>
