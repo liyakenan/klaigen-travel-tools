@@ -39,7 +39,16 @@ The agent pastes text, attaches a PDF, or points to a file. Read all of it. Then
 - **Price:** line items, total, per person or for everyone, currency. Payment terms (deposit, balance, who gets paid and how).
 - **Terms and notes.**
 
-Only ask when something essential is missing or contradictory (for example, two different arrival times). Ask one short question at a time. Otherwise go ahead, and put the smaller doubts on the checklist.
+### Before you build: ask what is missing, in one message
+
+Check these every time. Ask **only the ones the agent hasn't answered**, together in **one short numbered message**, and wait for the answers before you build:
+
+1. **A celebration.** Is the trip for something special: a birthday (whose?), an anniversary, a honeymoon, release from the army (שחרור), retirement, a first holiday as parents, or anything else? If the agent already said so, don't ask: it goes straight into the cover title (Step 5). If they didn't mention one, ask: "חוגגים משהו בחופשה הזו? (יום הולדת, יום נישואין, ירח דבש, שחרור, פנסיה, חופשה ראשונה כהורים…)".
+2. **Room type** for every hotel where it's missing ("איזה סוג חדר ב-<hotel>?"). Never guess it.
+3. **Flights:** baggage (checked bag and trolley, kg) and seat selection (הושבה), if not given.
+4. **Extra services:** "יש שירות נוסף שנכנס להצעה? העברות, אטרקציות, חיבור לספקים מסוימים?"
+
+Also ask when something essential is contradictory (for example, two different arrival times, or a weekday that doesn't match the date). Anything smaller goes on the checklist.
 
 Don't put names of the agent's suppliers or private contacts (like "Lucy, my agent in Hanoi") into the client's PDF unless the agent asks. Write "the local supplier" (הספק המקומי) instead.
 
@@ -61,7 +70,10 @@ Use ASCII letters only in the folder name (e.g. `quotes/2026-12-levi-vietnam/`).
    ```bash
    curl -sL -m 25 -A "Mozilla/5.0 (Macintosh)" "<official site>" | tr '\n' ' ' | grep -o -i -E '<meta[^>]+og:image[^>]*>|https?://[^"'"'"' )]+\.(jpe?g|webp)' | head -20
    ```
-   Skip logos and icons. Download the best photo (the building, the pool, a room or the view) as `stay-N.jpg`, check it with `file` (it must be a JPEG/PNG/WebP, not an HTML error page) and look at it before using it. Credit line: `"צילום: אתר המלון"`.
+   Skip logos and icons. Check every file with `file` (it must be a JPEG/PNG/WebP, not an HTML error page) and look at it before using it. Credit line: `"צילום: אתר המלון"`.
+   **Every hotel needs at least 8 big photos** that really show it: 1 for the hotel card (`photo`, the strongest one: the building, the lobby or the pool) plus **at least 7 for its gallery** (`gallery`), mixing the room, the lobby, the restaurant or breakfast, the pool or spa, and the view. If a room type is given, prefer photos of that room type. Download them large (about 1600 px wide) as `stay-1.jpg`, `stay-2.jpg`, …
+   Big chain sites (Hilton, Marriott, Accor, IHG…) often block `curl` or build the gallery with JavaScript, so the command above returns nothing. Then open the hotel's page in the browser tool and list the image URLs with a short script (`[...document.querySelectorAll('img,source')].map(e => e.currentSrc || e.src || e.srcset)`). Keep only photos on the hotel's own image server (e.g. `hilton.com/im/en/<HOTELCODE>/…`), ask for a large size (most image servers take width/height parameters in the URL), and download them with `curl`.
+   If you can't find 8 photos you are sure about, use the ones you have and say how many are missing on the checklist. Never pad the gallery with city photos or photos you aren't sure about.
    **Make sure it is really THIS hotel.** Before using a photo from a website, all of these must be true: the site's name and address match the hotel in the quote (same name AND same city; chains and look-alike names are a trap: "Rex Hotel Saigon" is not "Rex Hanoi Hotel"); the image file is on the hotel's own domain or its own image server; and when you look at it, it shows a hotel (building, pool, room, lobby or view), not a stock photo of a beach, a person, a logo or a generic city skyline. If any one of these is doubtful, **don't use it**: go to option 3.
 3. **No official site, or no photo you are sure about:** use a photo of the **city or area** from Wikipedia (see the cover photo below) and mark the stay with `photoIsCity: true`, so the card says "תמונת היעד" (photo of the destination) and nobody thinks it's the hotel. Put that hotel on the hand-off checklist ("אין תמונה של המלון, שמתי תמונה של העיר").
 
@@ -98,12 +110,19 @@ Write `quote.js` in the quote folder, as `window.QUOTE = { … };`. Leave out an
 ```js
 window.QUOTE = {
   agency: { /* copied from agency.json */ },
-  client: { title: "החופשה של רונה ומיכל לוי", destination: "וייטנאם", destinationLatin: "Vietnam", subtitle: "וייטנאם · דצמבר 2026",
+  client: { title: "חופשת יום הולדת מושלמת", destination: "וייטנאם", destinationLatin: "Vietnam",
+            subtitle: "רונה ומיכל לוי · וייטנאם · דצמבר 2026",       // the client's names go here when the title is a celebration
             dates: "9–23.12.2026", nights: "14 לילות", travelers: "2 מבוגרות", countryCode: "vn",
             photo: "cover.jpg", photoCredit: "צילום: … · CC BY-SA 4.0 · Wikimedia Commons" },
   issued: "04.11.2026", validUntil: "",               // either or both
-  includes: [ { icon: "✈️", text: "טיסות בינלאומיות" }, { icon: "🏨", text: "6 מלונות" } ],
-  intro: "2 warm sentences about the trip, written for the client. Only facts from the quote.",
+  includes: [ { icon: "🎂", text: "חופשה לכבוד יום ההולדת של רונה" }, { icon: "✈️", text: "טיסות בינלאומיות" }, { icon: "🏨", text: "6 מלונות" },
+              { icon: "🤝", text: "המלצות וליווי אישי שלי לאורך כל החופשה" } ],   // ALWAYS include this one
+  introTitle: "רונה ומיכל, אני כל כך מתרגשת בשבילכן! 🥳🎉",   // big, bold, black, under the cover photo
+  intro: [ "רונה, יום ההולדת שלך בווייטנאם, ואני ממש שמחה לקחת בו חלק! 🎂🥂",
+           "שבועיים מהצפון ועד מרכז הארץ 🇻🇳",
+           "לילה על ספינה במפרץ האלונג 🛳️",
+           "ואני לצידכן לאורך כל החופשה 💙" ],                       // one short line each, emoji only at the END of a line
+  flightsNote: [ "✨ טיסת החזרה בלילה, כך שגם היום האחרון הוא יום מלא" ],   // optional, see "Flight hours" below
   route: [ { name: "האנוי", local: "Hanoi", nights: 2, lat: 21.0283, lng: 105.854 } ],
   flights: [ { kind: "intl" | "domestic", date: "רביעי 09.12.26", from: "TLV", fromName: "תל אביב", fromLocal: "Tel Aviv",
                to: "HAN", toName: "האנוי", toLocal: "Hanoi", toCountry: "Vietnam",
@@ -113,7 +132,9 @@ window.QUOTE = {
   stays: [ { city: "האנוי", cityLocal: "Hanoi", name: "Rex Hanoi Hotel", kind: "hotel" | "cruise",
              dates: "10–12.12", days: "חמישי עד שבת", nights: 2, guests: "2 מבוגרות",
              board: "לינה וארוחת בוקר", room: "Deluxe room, 2 twin beds", cancel: "ביטול חינם עד 03.12",
-             extra: "", photo: "stay-1.jpg", photoIsCity: false, photoNote: "צילום: אתר המלון", url: "https://…" } ],
+             extra: "", photo: "stay-1.jpg", photoIsCity: false, photoNote: "צילום: אתר המלון", url: "https://…",
+             gallery: [ "stay-2.jpg", "stay-3.jpg", "stay-4.jpg", "stay-5.jpg", "stay-6.jpg", "stay-7.jpg", "stay-8.jpg" ],  // at least 7
+             galleryNote: "צילום: אתר המלון" } ],
   transfersIntro: "", transfers: [ { date: "10.12", title: "נחיתה בהאנוי", desc: "הסעה פרטית משדה התעופה למלון." } ],
   price: { rows: [ { label: "טיסות", amount: "$2,400", alt: "₪8,880" } ], total: "$7,950", totalAlt: "₪29,415", totalLabel: "סה״כ לחבילה",
            perPerson: "$3,975 לאדם", perPersonAlt: "₪14,708 לאדם", note: "ההמרה לשקלים לפי שער של 3.70 ₪ לדולר. השער הסופי נקבע ביום התשלום." },
@@ -131,7 +152,19 @@ Writing rules:
 - Dates are short: `10–12.12`, `09.12.26`. Weekdays in Hebrew in `days` or in a flight's `date`.
 - Prices exactly as the agent gave them, with the currency symbol. If the agent gave no price, set `price: null`: the section disappears.
 - **Shekels.** Israeli clients often want the price in ₪ too. If the agent asks for it (or the quote is in $ or €), show the shekel amount under each line (`alt`), under the total (`totalAlt`) and per person (`perPersonAlt`), and say the rate in `note`. **Use the exchange rate the agent gives you. Never invent a rate:** if they gave none, ask once ("באיזה שער להמיר?"). Round each shekel amount to a whole shekel, and make sure the lines add up to the total.
-- The client's title and the intro are the only text you write yourself. Keep them warm and factual.
+- The client's title, the intro and the flight-hours note are the only text you write yourself. Keep them warm and factual.
+
+**The cover title.** If they celebrate something, the celebration **is** the title, big: "חופשת יום הולדת מושלמת", "ירח הדבש של דנה ואבי", "חופשת יום נישואין 10 בפריז", "חופשת שחרור בתאילנד", "חופשה ראשונה כהורים", "חופשת פנסיה ברומא". Then the names go in `subtitle` ("ליה ומייקל קינן · פריז · דצמבר 2026"). Add a matching item at the top of `includes` (e.g. `🎂 חופשה לכבוד יום ההולדת של מייקל`). With no celebration, the title is personal with the travellers' names: "החופשה של ליה ומייקל".
+
+**The excited text under the cover photo.** The agent wants the client to feel how excited and close she is:
+- `introTitle`: a short greeting with the names and the excitement, e.g. "ליה ומייקל, אני כל כך מתרגשת בשבילכם! 🥳🎉". It prints big, bold and black.
+- `intro`: an **array of short lines**, 4–7 of them, one idea per line: the celebration ("מייקל, יום ההולדת שלך בפריז, ואני ממש שמחה לקחת בו חלק! 🎂🥂"), the highlights of the package, and "ואני לצידכם לאורך כל החופשה 💙". It prints bold.
+- Each line ends with 1–2 emoji **relevant** to it (🎂🥂 birthday, 💍 anniversary, 🌴 beach, ✈️ flight, 🚗 driver, 🥐 breakfast, 🗼 Paris…). **Never put an emoji in the middle of a line**: break the line instead. Only facts from the quote.
+- Use the agent's voice and gender ("מתרגשת" for a woman) and address the travellers correctly (לכם / לכן / לך).
+
+**Personal service.** Always add `{ icon: "🤝", text: "המלצות וליווי אישי שלי לאורך כל החופשה" }` to `includes`, and mention it in the intro.
+
+**Flight hours.** When the hours are good for the client, say so in `flightsNote`, one short bold line each, worked out only from the times you were given: an early outbound flight ("✨ טסים בבוקר ונוחתים בזמן לנצל את יום ההגעה במלואו"), a late return ("✨ טיסת החזרה בלילה, כך שגם היום האחרון הוא יום מלא"), or hours that fit check-in and check-out (only if the hotel's check-in/out times were given). If the hours aren't convenient, leave `flightsNote` out and mention it on the agent's checklist instead.
 
 ## Step 6: Make the PDF and check it
 
@@ -145,19 +178,22 @@ Writing rules:
 ```
 Then rename `quote.pdf` to the Hebrew title, e.g. `הצעת מחיר - רונה ומיכל לוי - וייטנאם.pdf`. If Chrome prints nothing, the cause is almost always in the page (a missing file, an emoji in `contactTitle`), not the browser.
 
-Check it once, without installing anything: take a screenshot with the same browser (`--screenshot="<folder>/check.png" --window-size=1400,2600`), Read it, and look at the cover and the first stays page. Fix only real problems: grey maps, missing photos, cut-off text. Then delete `check.png`.
+Check it once, without installing anything: take a screenshot with the same browser (`--screenshot="<folder>/check.png" --window-size=1400,2600`), Read it, and look at the cover, the first stays page and the hotel gallery. Fix only real problems: grey maps, missing photos, cut-off text, an emoji in the middle of an intro line, or a cover that spills onto a second page (then shorten the intro lines). Then delete `check.png`.
 
 ## Step 7: Hand-off to the agent
 
 A short message in their language:
 1. **Where the PDF is.**
 2. **A ready WhatsApp message** to the client, short and warm, in the agency's voice.
-3. **"מה לבדוק לפני ששולחים"**: everything you weren't sure about, everything you left out, and **which stays show a city photo instead of the hotel** (so the agent can drop in a hotel photo and ask you to rebuild).
-4. One line: to change anything, just say it in plain words ("תוסיף את המחיר", "תחליף את התמונה של המלון בסאפה בקובץ הזה").
+3. **"מה לבדוק לפני ששולחים"**: everything you weren't sure about, everything you left out, **which stays show a city photo instead of the hotel**, and any hotel with fewer than 8 photos (so the agent can drop in photos and ask you to rebuild).
+4. **"הערות חשובות להדגיש ללקוח"**: anything the client must know, for example a flight on Shabbat or a holiday, a very early or late flight, a long stopover, a visa or passport validity rule, a non-refundable room, or a price that depends on availability. Write these to the agent; she decides what to tell the client.
+5. One line: to change anything, just say it in plain words ("תוסיף את המחיר", "תחליף את התמונה של המלון בסאפה בקובץ הזה").
 
 ## Rules
 
 - **Never invent** a time, date, price, room type, board basis or cancellation term.
-- Hotel photos only from the agent or the hotel's official site, and only when you are sure it is that exact hotel; otherwise a labelled city photo from Wikimedia, with credit. Never an AI-generated or look-alike photo.
+- Hotel photos only from the agent or the hotel's official site, and only when you are sure it is that exact hotel; otherwise a labelled city photo from Wikimedia, with credit. Never an AI-generated or look-alike photo. Aim for at least 8 per hotel.
+- A celebration always goes in the cover title. If the agent didn't mention one, ask before you build.
+- Always include "המלצות וליווי אישי שלי לאורך כל החופשה".
 - Never ask for or store passport numbers, ID numbers or card details.
 - Keep `assets/template.html` unchanged; all content goes in `quote.js`.
