@@ -44,7 +44,7 @@ Then write `agency.json`:
 You need these. Ask **only for what is missing**, one question at a time:
 
 - **Destination** (city or region), and **dates** or the number of days.
-- **Who is travelling**: adults, and children's **ages**. Use first names or a family name for the title.
+- **Who is travelling**: adults, and children's **ages**, and **their names**: the plan's title is always personal, with the travellers' names, so it feels made exactly for them ("הטיול של ליה ומייקל לפריז", "החופשה של משפחת כהן בבודפשט"). Never a generic title like "טיול לפריז". If they celebrate something (a birthday, an anniversary, a honeymoon…), put it in the title too ("ירח הדבש של דנה ואבי ברומא").
 - **Hotel name**. This is **mandatory**, because every travel time is measured from it. If there are several hotels, ask which nights are in which hotel.
 - **Interests and style**: food, nature, museums, shopping, nightlife, relaxing.
 - **Constraints**: kosher, Shabbat, accessibility, a stroller, budget. Apply the `defaults` from `agency.json` automatically.
@@ -71,7 +71,7 @@ curl -s -A "tour-planner-skill/1.0" "https://nominatim.openstreetmap.org/search?
 
 Quality comes first, and speed comes from doing the research **in parallel**, not from checking less. Before you start, tell the agent in one line that you're starting and it will take about 10 minutes.
 
-**3a. Sketch the plan (you, 1–2 minutes).** Use your own knowledge of the destination, plus one parallel round of 3–5 searches if needed (events, closures, weather or sunset times on those dates). Decide:
+**3a. Sketch the plan (you, 1–2 minutes).** Use your own knowledge of the destination, plus **one parallel round of 4–6 searches** that always includes **2–3 searches for similar itineraries** (e.g. "<destination> 4 day itinerary", "<destination> itinerary for couples / with kids", in English and in Hebrew), and, if needed, events, closures, weather or sunset times on those dates. Compare those itineraries to pick **the most logical order**: which areas go together, what is best in the morning or at sunset, and which day suits each area (markets, closed days). Don't copy a blog; use it to check that the order makes sense. Decide:
 - the number of days, and for each day a **theme**, one or two neighbouring **areas** (group by geography), and 3–5 candidate stops including where to eat;
 - a catalog of 4–6 more candidates in 3 groups that fit the client.
 Arrival and departure days are light and close to the hotel. Shabbat (if relevant): only places within walking distance, nothing that needs paying or driving; add the nearest synagogue or Chabad House if useful.
@@ -182,6 +182,7 @@ window.TRIP = {
 The cover shows a big photo of the destination with the country's flag as a sticker. Do this for every trip:
 
 1. Choose the destination's most iconic landmark (Rome → Colosseum, Paris → Eiffel Tower, Budapest → Hungarian Parliament Building). Find its **English Wikipedia** page title.
+   **Photos only of photogenic places.** Use a photo only when the place is genuinely beautiful in a photo: a landmark, a view, a famous square, a beach. Look at every photo before you use it, and skip dull ones (a building entrance, a street sign, a parking lot, a dark or blurry shot). No photo is better than a dull one.
 2. Get the photo from the Wikipedia API (free, no key):
    ```bash
    curl -s -A "tour-planner-skill/1.0" "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages&piprop=thumbnail|name&pithumbsize=1600&titles=<Page_Title>"
@@ -250,7 +251,8 @@ Finish with a short message containing:
 1. **Where the files are**: the PDF, and the KML for the map.
 2. **The client's map in 5 steps**: go to mymaps.google.com → "יצירת מפה חדשה" (Create a new map) → under the layer, "ייבוא" (Import) and choose `מפה-לייבוא.kml` → click "מפה ללא שם" (Untitled map) at the top and rename it, e.g. "הטיול של משפחת כהן · בודפשט" (the client sees this name) → "שיתוף" (Share), turn on "כל מי שיש לו את הקישור" (Anyone with the link), and copy the link. The client doesn't need to install anything: the link opens on their phone. *Tell me the link and I'll add a QR code for the map to the PDF's cover.*
 3. **A ready-to-send WhatsApp message** to the client, short and warm, in the agency's voice.
-4. **"מה לבדוק לפני ששולחים"**: a list of everything you weren't sure about: places you couldn't confirm, missing ratings, kosher status, hours that may change, and places without a map marker. If there's nothing, say so.
+4. **"מה לבדוק לפני ששולחים"**: a list of everything you weren't sure about: places you left out because you couldn't confirm them, missing ratings, kosher status, hours that may change, and places without a map marker. If there's nothing, say so.
+5. **"הערות חשובות להדגיש ללקוח"**: every note the client must know, collected from the helpers' `NOTE:` lines and your own: what to book ahead and by when, closed days, dress codes, IDs, cash only, Shabbat and holidays, weather. Write them to the agent; she decides what to tell the client.
 
 When the agent sends the My Maps link, put it in `myMapsUrl` and make the PDF again.
 
@@ -261,6 +263,8 @@ The agent asks in plain words ("swap days 2 and 3", "add a zoo", "make day 1 cal
 ## Rules
 
 - **Never invent** a rating, price, opening hour, address or kosher status. Unknown means left empty, and it goes on the checklist.
+- **Not sure about a place? Leave it out.** Only places you could confirm go into the plan; the rest go on the agent's checklist.
+- The title is always personal, with the travellers' names.
 - Never ask for or store passport numbers, ID numbers or credit cards.
 - Travel times are estimates. The PDF already says so in its footer.
 - Keep `assets/template.html` unchanged. All trip content goes in `trip.js`.
